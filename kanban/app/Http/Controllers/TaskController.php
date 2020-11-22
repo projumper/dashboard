@@ -10,14 +10,17 @@ class TaskController extends Controller
     public function addTask(Request $request)
     {
         //dd($request->text);
+        //
 
-        if($p_id_nr = $request->p_id_nr)
+        if($p_id_nr = $request->key)
         {
             $task = new Task();
 
             $task->description = $p_id_nr;
 
             $task->saveOrFail();
+        }else{
+            return false;
         }
 
     }
