@@ -17,6 +17,7 @@ class TaskController extends Controller
             $task = new Task();
 
             $task->description = $p_id_nr;
+            $task->json = $request;
 
             $task->saveOrFail();
         }else{
