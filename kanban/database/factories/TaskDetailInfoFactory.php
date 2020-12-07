@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Task;
+use App\Models\TaskDetailInfo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class TaskFactory extends Factory
+class TaskDetailInfoFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Task::class;
+    protected $model = TaskDetailInfo::class;
 
     /**
      * Define the model's default state.
@@ -22,10 +22,7 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
-            'p_id_nr' =>'TEST-'.rand(1,999),
-            'description'=> $this->faker->sentence,
-            'json'=>$this->faker->sentence,
-            'deadline'=>$this->faker->dateTime
+            //
         ];
     }
 }
