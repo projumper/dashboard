@@ -62,6 +62,8 @@ class TaskController extends Controller
 
                 $task->worklog()->save($worklog);
 
+                \Log::info('Task added');
+
                 //$task->employeetime()->save($employeetime);
 
                 return response()->json(['status' => 'OK']);
