@@ -19,3 +19,5 @@ Route::get('/', function () {
 });
 
 Route::get('/alltasks', [TaskController::class, 'all'])->name('alltasks');
+
+//Route::get('/gettasks', [TaskController::class, 'all'])->name('alltasks');

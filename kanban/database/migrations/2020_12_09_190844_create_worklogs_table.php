@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTasksTable extends Migration
+class CreateWorklogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,17 @@ class CreateTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('worklogs', function (Blueprint $table) {
             //$table->id();
-            $table->string('p_id_nr')->primary();
-            $table->string('description')->nullable();
-            $table->longText('json');
-            $table->date('deadline')->nullable();
+
+            $table->string('p_id_nr')->primary(); // HKD-123
+            $table->string('task_p_id_nr')->unique();
+
+            $table->longText('worklog_json')->nullable();
+
             $table->timestamps();
+
+            $table->foreign('task_p_id_nr')->references('p_id_nr')->on('tasks')->onDelete('cascade');
         });
     }
 
@@ -30,6 +34,6 @@ class CreateTasksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('worklogs');
     }
 }

@@ -17,4 +17,12 @@ class Task extends Model
     {
         return $this->hasOne(TaskDetailInfo::class);
     }
+
+    public function worklog(){
+        return $this->hasOne(Worklog::class);
+    }
+
+    public function employeetime(){
+        //return $this->hasOne(Employee_hour::class);
+    }
 }
