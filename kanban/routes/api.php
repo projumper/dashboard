@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EmployeeHourController;
+use App\Http\Controllers\TaskDetailInfoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,11 +34,18 @@ use App\Http\Controllers\EmployeeHourController;
 
     Route::get('v1/getworklog/key/{key}', [TaskController::class, 'getWorklog'])->name('getworklog');
 
+    Route::get('v1/gettaskdata/key/{key}', [TaskController::class, 'getTaskData'])->name('gettaskdata');
+
     Route::get('v1/get/user/{user}/date/{date}/status/{status}', [EmployeeHourController::class, 'getTime'])->name('gettime');
 
 
 
     Route::post('v1/addTime', [EmployeeHourController::class, 'addTime'])->name('addtime');
 
+    Route::get('v1/getEmployeeTime/date/{date}', [EmployeeHourController::class, 'getEmployeeTime'])->name('getemployeetime');
+
     Route::get('v1/getTasks/date/{date}', [TaskController::class, 'getTasksDate'])->name('gettasks');
 
+    Route::get('v1/getEmployeeWeekPlan', [TaskDetailInfoController::class, 'getEmployeeWeekPlan'])->name('getthisweek');
+
+    //Route::get('v1/get/user/{user}/date/{date}/status/{status}', [EmployeeHourController::class, 'getTime'])->name('gettime');

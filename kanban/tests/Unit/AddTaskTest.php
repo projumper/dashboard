@@ -5,10 +5,12 @@ namespace Tests\Unit;
 use App\Models\Task;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
 
 
 class AddTaskTest extends TestCase
@@ -49,48 +51,53 @@ class AddTaskTest extends TestCase
     /**
      * @dataProvider keyProvider
      */
-
     public function test_add_task($p_id_nr)
     {
 
-        $data = json_decode($this->jsonString);
-        $data->key = $p_id_nr;
-        $data = get_object_vars($data);
+        $taskData = $this->getJson('api/v1/gettaskdata/key/'.$p_id_nr);
+        $taskData1 = $taskData->getContent();
+        $jsonstring = json_decode($taskData1);
+        $data = get_object_vars($jsonstring);
+        //dd($jsonstring->key);
+        if(isset($jsonstring->key) && $jsonstring->key == $p_id_nr) {
 
-
-        $this->postJson(route('add'), $data)
-            ->assertStatus(200)
-            ->assertJson(['status' => 'OK']);
+            $this->postJson(route('add'), $data)
+                ->assertStatus(200)
+                ->assertJson(['status' => 'OK']);
+        }
     }
 
     /**
      * @dataProvider keyProvider
      */
-    public function test_edit_task($p_id_nr, $jsonstring)
+    public function test_edit_task($p_id_nr)
     {
 
-        //dd($p_id_nr);
-        $data = json_decode($jsonstring);
-        $data->key = $p_id_nr;
-        //dd($data->key);
-        $data = get_object_vars($data);
+        $taskData = $this->getJson('api/v1/gettaskdata/key/'.$p_id_nr);
+        $taskData1 = $taskData->getContent();
+        $jsonstring = json_decode($taskData1);
+        $data = get_object_vars($jsonstring);
 
-        //than edit
-        $this->putJson(route('edit'), $data)
-            ->assertStatus(200)
-            ->assertJson(['status' => 'OK']);
+        //dd($data);
+
+        if(isset($jsonstring->key) &&  $jsonstring->key == $p_id_nr) {
+            $this->putJson(route('edit'), $data)
+                ->assertStatus(200)
+                ->assertJson(['status' => 'OK']);
+        }
     }
 
     public function keyProvider()
     {
         $keyArray = array();
 
-        for ($i = 10; $i <= 235; $i++) {
-            //$keyArray[$i] = ['ZW-' . $i, $this->jsonString];
-            $keyArray[$i] = ['key'=>'ZW-' . $i, 'data'=>$this->jsonString];
+        for ($i = 8; $i <= 11; $i++) {
+
+            $p_id_nr = 'TEST-'.$i;
+
+            $keyArray[$i] = ['key'=>$p_id_nr];
         }
 
-       // dd($keyArray);
         return $keyArray;
 
     }

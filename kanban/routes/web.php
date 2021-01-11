@@ -18,6 +18,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/alltasks', [TaskController::class, 'all'])->name('alltasks');
 
-//Route::get('/gettasks', [TaskController::class, 'all'])->name('alltasks');
+Route::get('/matime', function () {
+    return view('matime');
+});
+
+
+
+Route::get('/getthisweek', function () {
+    return view('getthisweek');
+});
+
+
+Route::get('/alltasks', function () {
+    return view('alltasks');
+});
+
+Route::get('/getemployeetime', function () {
+    return view('getemployeetime');
+});

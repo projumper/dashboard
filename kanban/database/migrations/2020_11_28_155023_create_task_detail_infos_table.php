@@ -39,6 +39,8 @@ class CreateTaskDetailInfosTable extends Migration
             $table->string('kva_id_paid')->nullable();
             $table->string('customer_task_raiting')->nullable();
 
+            $table->date('start_date')->nullable();
+
             $table->timestamps();
 
             $table->foreign('task_p_id_nr')->references('p_id_nr')->on('tasks')->onDelete('cascade');
