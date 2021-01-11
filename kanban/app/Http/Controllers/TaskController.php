@@ -157,7 +157,7 @@ class TaskController extends Controller
                 if(isset($payload->fields->customfield_11010)){
                     $start_date = $payload->fields->customfield_11010;
                 }else{
-                    $start_date = '12-12-1981';
+                    $start_date = '1981-12-12';
                 }
 
                 \Log::info('createdate_jira '. date('Y-m-d', strtotime($payload->fields->created)));
