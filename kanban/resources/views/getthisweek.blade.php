@@ -12,70 +12,110 @@
 
 <button>GO</button>
 
+<script src="https://momentjs.com/downloads/moment.min.js"></script>
 <script src="https://bossanova.uk/jexcel/v4/jexcel.js"></script>
 <script src="https://bossanova.uk/jsuites/v3/jsuites.js"></script>
-<link rel="stylesheet" href="https://bossanova.uk/jsuites/v3/jsuites.css" type="text/css" />
-<link rel="stylesheet" href="https://bossanova.uk/jexcel/v4/jexcel.css" type="text/css" />
+<link rel="stylesheet" href="https://bossanova.uk/jsuites/v3/jsuites.css" type="text/css"/>
+<link rel="stylesheet" href="https://bossanova.uk/jexcel/v4/jexcel.css" type="text/css"/>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    // TODO: get real full list from jira
+    let employees = {
+        '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915': 'Ivan',
+        '557058:e33f889f-36f5-476b-a1a7-f21bb2c74916': 'Edgar',
+    }
 
-    var data;
+    $(document).ready(function () {
+        $("button").click(function () {
 
-    $(document).ready(function(){
+            let selector = document.getElementById('ma');
+            // let value = selector[selector.selectedIndex].value;
+            // let datetoselect = document.getElementById('date').value;
 
+            $.ajax({
+                url: "{{ config('app.api_url') }}/getEmployeeWeekPlan", success: function (result) {
+                    let data = {}
 
+                    for (let i = 0; i < 7; i++) {
+                        // Create array where this week dates is keys
+                        data[moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD')] = {}
+                    }
 
+                    result.forEach((task => {
+                        if (task.employee_code.length) {
+                            // Add employee code as array key
+                            data[task.start_date][task.employee_code] = []
+                        }
+                    }))
 
-        $("button").click(function(){
+                    let maxEstimate = 0;
+                    result.forEach((task => {
+                        if (task.employee_code.length) {
+                            let hours = task.estimated_time / 60 / 60
+                            for (let h = 1; h <= hours; h++) {
+                                data[task.start_date][task.employee_code].push(task.p_id_nr)
+                            }
+                            maxEstimate = maxEstimate >= data[task.start_date][task.employee_code].length ? maxEstimate : data[task.start_date][task.employee_code].length;
+                        }
+                    }))
 
-            var selector = document.getElementById('ma');
-            var value = selector[selector.selectedIndex].value;
-
-            var datetoselect = document.getElementById('date').value;
-
-
-            //alert(datetoselect);
-
-            $.ajax({url: "http://127.0.0.1:8000/api/v1/getEmployeeWeekPlan", success: function(result){
-
-                    data = JSON.stringify(result);
-                    data = JSON.parse(data);
-                     alert(JSON.stringify(result));
-
-
-
-
+                    let tableData = []
+                    for (let line = 0; line < maxEstimate; line++) { // TODO: get max estimate
+                        tableData[line] = {}
+                        for (let i = 0; i < 7; i++) {
+                            let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
+                            Object.keys(data[date]).forEach((key) => {
+                                if (data[date][key][line]) {
+                                    tableData[line][i] = (tableData[line][i] ?? '') + '<div><b>' + (employees[key] ?? '?') + '</b><br/>' + data[date][key][line] + '</div>'
+                                }
+                            })
+                        }
+                    }
 
                     jexcel(document.getElementById('spreadsheet'), {
-                        data:data,
-                        footers: [['Total','', '','','','','=SUMCOL(TABLE(), COLUMN())', '']],
+                        data: tableData,
                         columns: [
-
-
-                            { type: 'text', title:'Montag', width:120 },
-                            { type: 'text', title:'Dienstag', width:120 },
-                            { type: 'text', title:'Mittwoch', width:180 },
-                            { type: 'text', title:'Donnerstag', width:180 },
-                            { type: 'text', title:'Freitag', width:180 },
-                            { type: 'text', title:'Samstag', width:180 },
-                            { type: 'text', title:'Sonntag', width:180 }
+                            {
+                                type: 'html',
+                                title: 'Montag ' + moment().startOf('isoweek').add(0, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Dienstag ' + moment().startOf('isoweek').add(1, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Mittwoch ' + moment().startOf('isoweek').add(2, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Donnerstag ' + moment().startOf('isoweek').add(3, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Freitag ' + moment().startOf('isoweek').add(4, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Samstag ' + moment().startOf('isoweek').add(5, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            },
+                            {
+                                type: 'html',
+                                title: 'Sonntag ' + moment().startOf('isoweek').add(6, 'days').format('DD.MM.YYYY'),
+                                width: 180
+                            }
 
                         ]
                     });
-
-                    SUMCOL = function(instance, columnId) {
-                        var total = 0;
-                        for (var j = 0; j < instance.options.data.length; j++) {
-                            if (Number(instance.records[j][columnId-1].innerHTML)) {
-                                total += Number(instance.records[j][columnId-1].innerHTML);
-                            }
-                        }
-                        return total;
-                    }
-
-
-                }});
+                }
+            });
         });
     });
 

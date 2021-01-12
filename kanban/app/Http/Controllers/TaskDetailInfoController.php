@@ -23,16 +23,6 @@ class TaskDetailInfoController extends Controller
             ->whereBetween('start_date', [$from, $to])
             ->get();
 
-        $myTable = array();
-
-        foreach ($times as $time){
-
-            $data[0] = $time->task_p_id_nr;
-            $data[1] = $time->task_p_id_nr;
-        }
-
-
-        //dd($data);
         return json_decode($times);
     }
 }
