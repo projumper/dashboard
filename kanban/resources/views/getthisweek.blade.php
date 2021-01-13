@@ -61,7 +61,7 @@
                     }))
 
                     let tableData = []
-                    for (let line = 0; line < maxEstimate; line++) { // TODO: get max estimate
+                    for (let line = 0; line < maxEstimate; line++) {
                         tableData[line] = {}
                         for (let i = 0; i < 7; i++) {
                             let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
