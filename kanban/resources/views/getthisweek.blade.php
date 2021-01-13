@@ -60,6 +60,8 @@
                         }
                     }))
 
+                    console.log(data);
+
                     let tableData = []
                     for (let line = 0; line < maxEstimate; line++) {
                         tableData[line] = {}
@@ -68,10 +70,14 @@
                             Object.keys(data[date]).forEach((key) => {
                                 if (data[date][key][line]) {
                                     tableData[line][i] = (tableData[line][i] ?? '') + '<div><b>' + (employees[key] ?? '?') + '</b><br/>' + data[date][key][line] + '</div>'
+                                } else {
+                                    tableData[line][i] = (tableData[line][i] ?? '') + ''
                                 }
                             })
                         }
                     }
+
+                    console.log(tableData);
 
                     jexcel(document.getElementById('spreadsheet'), {
                         data: tableData,
