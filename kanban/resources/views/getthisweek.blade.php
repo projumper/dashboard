@@ -71,7 +71,7 @@
                                 if (data[date][key][line]) {
                                     tableData[line][i] = (tableData[line][i] ?? '') + '<div><b>' + (employees[key] ?? '?') + '</b><br/>' + data[date][key][line] + '</div>'
                                 } else {
-                                    tableData[line][i] = ''
+                                    tableData[line][i] = (tableData[line][i] ?? '') + ''
                                 }
                             })
                         }
