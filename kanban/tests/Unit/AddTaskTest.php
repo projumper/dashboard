@@ -54,12 +54,12 @@ class AddTaskTest extends TestCase
     public function test_add_task($p_id_nr)
     {
 
-        $taskData = $this->getJson('api/v1/gettaskdata/key/'.$p_id_nr);
+        $taskData = $this->getJson('api/v1/gettaskdata/key/' . $p_id_nr);
         $taskData1 = $taskData->getContent();
         $jsonstring = json_decode($taskData1);
         $data = get_object_vars($jsonstring);
         //dd($jsonstring->key);
-        if(isset($jsonstring->key) && $jsonstring->key == $p_id_nr) {
+        if (isset($jsonstring->key) && $jsonstring->key == $p_id_nr) {
 
             $this->postJson(route('add'), $data)
                 ->assertStatus(200)
@@ -73,14 +73,14 @@ class AddTaskTest extends TestCase
     public function test_edit_task($p_id_nr)
     {
 
-        $taskData = $this->getJson('api/v1/gettaskdata/key/'.$p_id_nr);
+        $taskData = $this->getJson('api/v1/gettaskdata/key/' . $p_id_nr);
         $taskData1 = $taskData->getContent();
         $jsonstring = json_decode($taskData1);
         $data = get_object_vars($jsonstring);
 
         //dd($data);
 
-        if(isset($jsonstring->key) &&  $jsonstring->key == $p_id_nr) {
+        if (isset($jsonstring->key) && $jsonstring->key == $p_id_nr) {
             $this->putJson(route('edit'), $data)
                 ->assertStatus(200)
                 ->assertJson(['status' => 'OK']);
@@ -91,11 +91,15 @@ class AddTaskTest extends TestCase
     {
         $keyArray = array();
 
-        for ($i = 8; $i <= 11; $i++) {
+        $projectArray = array('DSET', 'HKDSHOP', 'BS', 'HKD', 'ZW', 'TIM', 'IM20', 'BL', 'ADC', 'SVB', 'EL', 'ET', 'GOT', 'GF', 'HSSEO', 'HCED', 'HS', 'IZ', 'KAIM', 'TAXI');
 
-            $p_id_nr = 'TEST-'.$i;
+        foreach ($projectArray as $project) {
+            for ($i = 1; $i <= 350; $i++) {
 
-            $keyArray[$i] = ['key'=>$p_id_nr];
+                $p_id_nr = $project . '-' . $i;
+
+                $keyArray[] = ['key' => $p_id_nr];
+            }
         }
 
         return $keyArray;
