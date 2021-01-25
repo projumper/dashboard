@@ -12,7 +12,7 @@ class TaskDetailInfoController extends Controller
         $year = 2021;
         $kalenderwoche = 2;
 
-        $timestamp_montag = date('Y-m-d',strtotime('last monday'));
+        $timestamp_montag = date('Y-m-d',strtotime('monday this week'));
         $timestamp_freitag = date('Y-m-d',strtotime('next friday'));
 
         $from = $timestamp_montag;
@@ -25,4 +25,19 @@ class TaskDetailInfoController extends Controller
 
         return json_decode($times);
     }
+
+    public function getOpenTasks(Request $request){
+
+        $today = date('Y-m-d', strtotime('now'));
+
+        $times = DB::table('task_detail_infos')
+            ->select('status', 'task_p_id_nr', 'issue_type')
+            ->where('start_date', '<', $today)
+            ->where('status', '<>', 'Fertig')
+            ->where('issue_type', '<>','Story')
+            ->get();
+
+        return json_decode($times);
+    }
+
 }

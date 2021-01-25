@@ -24,14 +24,14 @@
     let employees = {
         '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915': 'Ivan',
         '557058:e33f889f-36f5-476b-a1a7-f21bb2c74916': 'Edgar',
+        '5b586e3bd2a2f82da138e269' :'OLeg',
+        '557058:660975c1-9644-4563-bcce-6b0b638207ef': 'Ivan R',
     }
 
     $(document).ready(function () {
         $("button").click(function () {
 
             let selector = document.getElementById('ma');
-            // let value = selector[selector.selectedIndex].value;
-            // let datetoselect = document.getElementById('date').value;
 
             $.ajax({
                 url: "{{ config('app.api_url') }}/getEmployeeWeekPlan", success: function (result) {
@@ -122,6 +122,41 @@
                     });
                 }
             });
+
+            $.ajax({
+                url: "{{ config('app.api_url') }}/getOpenTasks", success: function (result) {
+
+
+                    console.log(result);
+
+                    data = JSON.stringify(result);
+                    data = JSON.parse(data);
+
+                    jexcel(document.getElementById('spreadsheet'), {
+                        data:data,
+                        footers: [['Total','', '','','','','=SUMCOL(TABLE(), COLUMN())', '']],
+                        columns: [
+                            { type: 'text', title:'status', width:120},
+
+                            { type: 'text', title:'task_p_id_nr', width:120 },
+                            { type: 'text', title:'issue_type', width:120 },
+                            { type: 'text', title:'created', width:180 },
+                            { type: 'text', title:'updated', width:180 },
+                            { type: 'text', title:'started', width:180 },
+                            { type: 'text', title:'timespendseconds', width:180 },
+                            { type: 'text', title:'dealine', width:180 },
+                            { type: 'text', title:'issueid_jira', width:120 },
+                            { type: 'text', title:'id_jira', width:120}
+                        ]
+                    });
+
+
+                }
+            });
+
+
+
+
         });
     });
 

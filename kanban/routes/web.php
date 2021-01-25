@@ -37,3 +37,7 @@ Route::get('/alltasks', function () {
 Route::get('/getemployeetime', function () {
     return view('getemployeetime');
 });
+
+Route::get('/getopentask', function () {
+    return view('getopentask');
+});
