@@ -24,8 +24,30 @@
     let employees = {
         '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915': 'Ivan',
         '557058:e33f889f-36f5-476b-a1a7-f21bb2c74916': 'Edgar',
-        '5b586e3bd2a2f82da138e269' :'OLeg',
+        '5b586e3bd2a2f82da138e269': 'OLeg',
         '557058:660975c1-9644-4563-bcce-6b0b638207ef': 'Ivan R',
+        '5c0e4906dc7a08769e2f2edd': 'User X',
+        '5eb172d3021ae30ba82474a0': 'User Y',
+        '557058:8f62e10d-7a55-449c-befb-378361c25e56': 'User Z',
+    }
+
+    let SUMCOL = function (instance, columnId) {
+        let total = 0;
+        for (let j = 0; j < instance.options.data.length; j++) {
+            if (Number(instance.records[j][columnId - 1].innerHTML)) {
+                total += Number(instance.records[j][columnId - 1].innerHTML);
+            }
+        }
+        return total;
+    }
+    let SUMROW = function (instance, rowId) {
+        let total = 0;
+        for (let j = 1; j < instance.options.columns.length - 1; j++) {
+            if (Number(instance.records[rowId - 1][j].innerHTML)) {
+                total += Number(instance.records[rowId - 1][j].innerHTML);
+            }
+        }
+        return total;
     }
 
     $(document).ready(function () {
@@ -60,7 +82,21 @@
                         }
                     }))
 
-                    console.log(data);
+                    console.log('Data', data);
+
+                    let columns = []
+                    for (let i = 0; i < 7; i++) {
+                        let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
+                        Object.keys(data[date]).forEach((key) => {
+                            columns.push({
+                                type: 'html',
+                                title: employees[key] ?? 'Unknown',
+                                width: 100,
+                            });
+                        });
+                    }
+
+                    console.log('Columns', columns);
 
                     let tableData = []
                     for (let line = 0; line < maxEstimate; line++) {
@@ -68,10 +104,13 @@
                         for (let i = 0; i < 7; i++) {
                             let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
                             Object.keys(data[date]).forEach((key) => {
+                                if (typeof tableData[line][i] == 'undefined') {
+                                    tableData[line] = [];
+                                }
                                 if (data[date][key][line]) {
-                                    tableData[line][i] = (tableData[line][i] ?? '') + '<div><b>' + (employees[key] ?? '?') + '</b><br/>' + data[date][key][line] + '</div>'
+                                    tableData[line].push(data[date][key][line]);
                                 } else {
-                                    tableData[line][i] = (tableData[line][i] ?? '') + ''
+                                    tableData[line].push('');
                                 }
                             })
                         }
@@ -79,46 +118,36 @@
 
                     console.log(tableData);
 
+                    let days = [
+                        'Montag',
+                        'Dienstag',
+                        'Mittwoch',
+                        'Donnerstag',
+                        'Freitag',
+                        'Samstag',
+                        'Sonntag',
+                    ]
+
+                    let headers = [];
+
+                    days.forEach((day, i) => {
+                        let columnCount = Object.keys(data[moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD')]).length
+                        if (columnCount) {
+                            headers.push({
+                                type: 'html',
+                                title: day + ' ' + moment().startOf('isoweek').add(i, 'days').format('DD.MM.YYYY'),
+                                colspan: columnCount
+                            })
+                        }
+                    })
+
+
                     jexcel(document.getElementById('spreadsheet'), {
                         data: tableData,
-                        columns: [
-                            {
-                                type: 'html',
-                                title: 'Montag ' + moment().startOf('isoweek').add(0, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Dienstag ' + moment().startOf('isoweek').add(1, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Mittwoch ' + moment().startOf('isoweek').add(2, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Donnerstag ' + moment().startOf('isoweek').add(3, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Freitag ' + moment().startOf('isoweek').add(4, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Samstag ' + moment().startOf('isoweek').add(5, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            },
-                            {
-                                type: 'html',
-                                title: 'Sonntag ' + moment().startOf('isoweek').add(6, 'days').format('DD.MM.YYYY'),
-                                width: 180
-                            }
-
-                        ]
+                        nestedHeaders: [
+                            headers
+                        ],
+                        columns: columns
                     });
                 }
             });
@@ -126,35 +155,73 @@
             $.ajax({
                 url: "{{ config('app.api_url') }}/getOpenTasks", success: function (result) {
 
+                    let data = []
+                    let statuses = []
 
-                    console.log(result);
+                    // Calculate
+                    result.forEach(task => {
+                        if (typeof data[task.employee_code] == 'undefined') {
+                            data[task.employee_code] = []
+                        }
+                        if (typeof data[task.employee_code][task.status] == 'undefined') {
+                            data[task.employee_code][task.status] = 0
+                        }
+                        data[task.employee_code][task.status] += 1
 
-                    data = JSON.stringify(result);
-                    data = JSON.parse(data);
+                        if (!statuses.includes(task.status)) {
+                            statuses.push(task.status)
+                        }
+                    })
+
+                    // Format
+                    let tableData = []
+                    statuses.forEach((status, i) => {
+                        tableData[i] = []
+                        tableData[i].push(status)
+
+                        Object.keys(data).forEach(key => {
+                            if (data[key][status]) {
+                                tableData[i].push(data[key][status])
+                            } else {
+                                tableData[i].push(0)
+                            }
+                        })
+
+                        tableData[i].push('=SUMROW(TABLE(), ROW())')
+                    })
+
+                    let columns = []
+                    let footers = []
+
+                    columns.push(
+                        {type: 'text', title: 'Status', width: 120},
+                    )
+                    footers.push('Total')
+
+                    Object.keys(data).forEach(key => {
+                        columns.push(
+                            {type: 'text', title: employees[key] ?? 'Unknown', width: 120},
+                        )
+                        footers.push('=SUMCOL(TABLE(), COLUMN())')
+                    })
+                    columns.push(
+                        {type: 'text', title: 'Total', width: 120},
+                    )
+                    footers.push('=SUMCOL(TABLE(), COLUMN())')
+
+                    console.log(data);
+                    console.log(statuses);
+                    console.log(tableData);
 
                     jexcel(document.getElementById('spreadsheet'), {
-                        data:data,
-                        footers: [['Total','', '','','','','=SUMCOL(TABLE(), COLUMN())', '']],
-                        columns: [
-                            { type: 'text', title:'status', width:120},
-
-                            { type: 'text', title:'task_p_id_nr', width:120 },
-                            { type: 'text', title:'issue_type', width:120 },
-                            { type: 'text', title:'created', width:180 },
-                            { type: 'text', title:'updated', width:180 },
-                            { type: 'text', title:'started', width:180 },
-                            { type: 'text', title:'timespendseconds', width:180 },
-                            { type: 'text', title:'dealine', width:180 },
-                            { type: 'text', title:'issueid_jira', width:120 },
-                            { type: 'text', title:'id_jira', width:120}
-                        ]
+                        data: tableData,
+                        footers: [footers],
+                        columns: columns
                     });
 
 
                 }
             });
-
-
 
 
         });
