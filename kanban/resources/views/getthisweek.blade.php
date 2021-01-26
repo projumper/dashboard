@@ -84,10 +84,19 @@
 
                     console.log('Data', data);
 
+                    let keysList = []
+                    Object.keys(data).forEach(date => {
+                        Object.keys(data[date]).forEach((key) => {
+                            if (!keysList.includes(key)) {
+                                keysList.push(key)
+                            }
+                        });
+                    })
+
                     let columns = []
                     for (let i = 0; i < 7; i++) {
                         let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
-                        Object.keys(data[date]).forEach((key) => {
+                        keysList.forEach((key) => {
                             columns.push({
                                 type: 'html',
                                 title: employees[key] ?? 'Unknown',
@@ -100,14 +109,11 @@
 
                     let tableData = []
                     for (let line = 0; line < maxEstimate; line++) {
-                        tableData[line] = {}
+                        tableData[line] = []
                         for (let i = 0; i < 7; i++) {
                             let date = moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
-                            Object.keys(data[date]).forEach((key) => {
-                                if (typeof tableData[line][i] == 'undefined') {
-                                    tableData[line] = [];
-                                }
-                                if (data[date][key][line]) {
+                            keysList.forEach((key) => {
+                                if (data[date][key] && data[date][key][line]) {
                                     tableData[line].push(data[date][key][line]);
                                 } else {
                                     tableData[line].push('');
@@ -131,7 +137,7 @@
                     let headers = [];
 
                     days.forEach((day, i) => {
-                        let columnCount = Object.keys(data[moment().startOf('isoweek').add(i, 'days').format('YYYY-MM-DD')]).length
+                        let columnCount = keysList.length
                         if (columnCount) {
                             headers.push({
                                 type: 'html',
