@@ -20,15 +20,10 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    // TODO: get real full list from jira
     let employees = {
-        '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915': 'Ivan',
-        '557058:e33f889f-36f5-476b-a1a7-f21bb2c74916': 'Edgar',
         '5b586e3bd2a2f82da138e269': 'OLeg',
         '557058:660975c1-9644-4563-bcce-6b0b638207ef': 'Ivan R',
-        '5c0e4906dc7a08769e2f2edd': 'User X',
-        '5eb172d3021ae30ba82474a0': 'User Y',
-        '557058:8f62e10d-7a55-449c-befb-378361c25e56': 'User Z',
+        '557058:8f62e10d-7a55-449c-befb-378361c25e56': 'Edgar',
     }
 
     let SUMCOL = function (instance, columnId) {
@@ -84,14 +79,16 @@
 
                     console.log('Data', data);
 
-                    let keysList = []
-                    Object.keys(data).forEach(date => {
-                        Object.keys(data[date]).forEach((key) => {
-                            if (!keysList.includes(key)) {
-                                keysList.push(key)
-                            }
-                        });
-                    })
+                    let keysList = Object.keys(employees)
+                    // Object.keys(data).forEach(date => {
+                    //     Object.keys(data[date]).forEach((key) => {
+                    //         if (Object.keys(employees).includes(key)) {
+                    //             if (!keysList.includes(key)) {
+                    //                 keysList.push(key)
+                    //             }
+                    //         }
+                    //     });
+                    // })
 
                     let columns = []
                     for (let i = 0; i < 7; i++) {
@@ -100,7 +97,7 @@
                             columns.push({
                                 type: 'html',
                                 title: employees[key] ?? 'Unknown',
-                                width: 100,
+                                width: 80,
                             });
                         });
                     }
