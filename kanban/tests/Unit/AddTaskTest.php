@@ -53,7 +53,6 @@ class AddTaskTest extends TestCase
      */
     public function test_add_task($p_id_nr)
     {
-
         $taskData = $this->getJson('api/v1/gettaskdata/key/' . $p_id_nr);
         $taskData1 = $taskData->getContent();
         $jsonstring = json_decode($taskData1);
@@ -72,7 +71,6 @@ class AddTaskTest extends TestCase
      */
     public function test_edit_task($p_id_nr)
     {
-
         $taskData = $this->getJson('api/v1/gettaskdata/key/' . $p_id_nr);
         $taskData1 = $taskData->getContent();
         $jsonstring = json_decode($taskData1);

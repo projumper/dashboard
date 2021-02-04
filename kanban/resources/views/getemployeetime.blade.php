@@ -39,7 +39,7 @@
 
             //alert(datetoselect);
 
-            $.ajax({url: "http://127.0.0.1:8000/api/v1/getEmployeeTime/date/"+datetoselect, success: function(result){
+            $.ajax({url: "{{ config('app.api_url') }}/getEmployeeTime/date/"+datetoselect, success: function(result){
 
                     data = JSON.stringify(result);
                     data = JSON.parse(data);

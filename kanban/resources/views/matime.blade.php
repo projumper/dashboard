@@ -18,16 +18,12 @@
 <link rel="stylesheet" href="https://bossanova.uk/jsuites/v3/jsuites.css" type="text/css" />
 <link rel="stylesheet" href="https://bossanova.uk/jexcel/v4/jexcel.css" type="text/css" />
 
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
     var data;
 
     $(document).ready(function(){
-
-
-
 
         $("button").click(function(){
 
@@ -36,18 +32,11 @@
 
             var datetoselect = document.getElementById('date').value;
 
-
-            //alert(datetoselect);
-
-        $.ajax({url: "http://127.0.0.1:8000/api/v1/get/user/"+value+"/date/"+datetoselect+"/status/Backlog", success: function(result){
+        $.ajax({url: "{{ config('app.api_url') }}/get/user/"+value+"/date/"+datetoselect+"/status/Backlog", success: function(result){
 
             data = JSON.stringify(result);
              data = JSON.parse(data);
             // alert(data[0].id);
-
-
-
-
 
                 jexcel(document.getElementById('spreadsheet'), {
                     data:data,

@@ -35,6 +35,8 @@ class CreateTaskDetailInfosTable extends Migration
             $table->string('status')->nullable();
             $table->string('indeed_deadline')->nullable(); //end_date
             $table->string('p_id')->nullable(); //HKD
+            $table->string('issue_type')->nullable();
+            $table->string('task_parent')->nullable();
 
             $table->string('kva_id_paid')->nullable();
             $table->string('customer_task_raiting')->nullable();

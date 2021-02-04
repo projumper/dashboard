@@ -175,6 +175,7 @@ class TaskController extends Controller
                 \Log::info('status ' .$payload->fields->status->name);
                 \Log::info('indeed_deadline '. date('Y-m-d', strtotime($payload->fields->customfield_10206)));
                 \Log::info('p_id '. $payload->fields->project->key);
+                //fields►issuetype►name
                 \Log::info('kva_id_paid '. '');
                 \Log::info('customer_task_raiting '. '');
                 \Log::info('start_date '. $start_date);
@@ -196,6 +197,7 @@ class TaskController extends Controller
                     'status' => $payload->fields->status->name,
                     'indeed_deadline' => date('Y-m-d', strtotime($payload->fields->customfield_10206)),
                     'p_id' => $payload->fields->project->key,
+                    'issue_type' => $payload->fields->issuetype->name,
                     'kva_id_paid' => '',
                     'customer_task_raiting' => '',
                     'start_date' => $start_date
@@ -230,7 +232,6 @@ class TaskController extends Controller
                     $task->worklog()->update([
                         'worklog_json' => $worklogData,
                     ]);
-
 
                     \Log::info('add time');
                     $request3 = Request::create(route('addtime'), 'POST');
@@ -268,7 +269,6 @@ class TaskController extends Controller
             $lastDay = date('t', mktime(0, 0, 0, $dateArray['month'], 1, $dateArray['year']));
             $to =   date('Y-m-d', mktime(0, 0, 0, $dateArray['month'], $lastDay, $dateArray['year']));
             $from = date('Y-m-d', mktime(0, 0, 0, $dateArray['month'], 1, $dateArray['year']));
-
 
         }else {
 
@@ -319,5 +319,4 @@ class TaskController extends Controller
         }
 
     }
-
 }

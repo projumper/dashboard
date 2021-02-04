@@ -46,8 +46,10 @@ use App\Http\Controllers\TaskDetailInfoController;
 
     Route::get('v1/getTasks/date/{date}', [TaskController::class, 'getTasksDate'])->name('gettasks');
 
-    Route::get('v1/getEmployeeWeekPlan', [TaskDetailInfoController::class, 'getEmployeeWeekPlan'])->name('getthisweek');
+    Route::get('v1/getEmployeeWeekPlan/week/{week}', [TaskDetailInfoController::class, 'getEmployeeWeekPlan'])->name('getthisweek');
 
     Route::get('v1/getOpenTasks',[TaskDetailInfoController::class, 'getOpenTasks'])->name('getopentasks');
+
+    Route::get('v1/getMonthData/date/{date}',[TaskDetailInfoController::class, 'getMonthData'])->name('getmonthdata');
 
     //Route::get('v1/get/user/{user}/date/{date}/status/{status}', [EmployeeHourController::class, 'getTime'])->name('gettime');

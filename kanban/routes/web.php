@@ -41,3 +41,8 @@ Route::get('/getemployeetime', function () {
 Route::get('/getopentask', function () {
     return view('getopentask');
 });
+
+
+Route::get('/getmonthdata', function () {
+    return view('getmonthdata');
+});

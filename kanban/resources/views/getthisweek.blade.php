@@ -56,7 +56,7 @@
             let selector = document.getElementById('ma');
 
             $.ajax({
-                url: "{{ config('app.api_url') }}/getEmployeeWeekPlan", success: function (result) {
+                url: "{{ config('app.api_url') }}/getEmployeeWeekPlan/week/this", success: function (result) {
                     let data = {}
 
                     for (let i = 0; i < 7; i++) {
