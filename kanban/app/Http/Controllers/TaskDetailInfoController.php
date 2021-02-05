@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,37 +11,9 @@ class TaskDetailInfoController extends Controller
 {
     public function getEmployeeWeekPlan(Request $request)
     {
+        $from = Carbon::parse($request->date)->startOfWeek()->format('Y-m-d');
+        $to = Carbon::parse($request->date)->endOfWeek()->format('Y-m-d');
 
-        //next week
-        //this week
-        //previrious week
-
-
-        if ($request->week == 'this') {
-
-            $timestamp_montag = date('Y-m-d', strtotime('monday this week'));
-            $timestamp_freitag = date('Y-m-d', strtotime('next friday'));
-
-            $from = $timestamp_montag;
-            $to = $timestamp_freitag;
-        }
-
-        if ($request->week == 'next') {
-
-        }
-
-        if ($request->week == 'last') {
-
-        }
-
-        $timestamp_montag = date('Y-m-d', strtotime('monday this week'));
-        $timestamp_freitag = date('Y-m-d', strtotime('next friday'));
-
-        $from = $timestamp_montag;
-        $to = $timestamp_freitag;
-
-
-        //Todo if times is empty
         $times = DB::table('task_detail_infos')
             ->select('*')
             ->whereBetween('start_date', [$from, $to])
@@ -57,7 +31,7 @@ class TaskDetailInfoController extends Controller
 //            ->select('status', 'task_p_id_nr', 'issue_type')
             ->where('start_date', '<', $today)
             ->where('status', '<>', 'Fertig')
-            ->where('issue_type', '<>','Story')
+            ->where('issue_type', '<>', 'Story')
             ->get();
 
         return json_decode($times);
@@ -87,14 +61,20 @@ class TaskDetailInfoController extends Controller
             ->get();
 
         $tasks = DB::table('task_detail_infos')
-            ->select('status', 'task_p_id_nr', 'issue_type')
+//            ->select('status', 'task_p_id_nr', 'issue_type')
             ->where('status', '<>', 'Selected for Development')
             ->where('issue_type', '<>', 'Story')
             ->get();
 
         //return '{tasks:' . $tasks . ', sumtime:' . $sumtime . '}';
-        return '{"tasksall:10", "tasksdone:100", "tasksqa:100", , "tasksinprogress:100", "backlog:100", "taskscangolive:100" "sumtime:100"}';
-
+        return new JsonResponse([
+            'taskall'        => rand(0, 100),
+            'tasksdone'      => rand(0, 100),
+            'tasksqa'        => rand(0, 100),
+            'backlog'        => rand(0, 100),
+            'taskscangolive' => rand(0, 100),
+            'sumtime'        => rand(0, 100),
+        ]);
     }
 
 }

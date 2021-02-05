@@ -80,15 +80,6 @@
                     console.log('Data', data);
 
                     let keysList = Object.keys(employees)
-                    // Object.keys(data).forEach(date => {
-                    //     Object.keys(data[date]).forEach((key) => {
-                    //         if (Object.keys(employees).includes(key)) {
-                    //             if (!keysList.includes(key)) {
-                    //                 keysList.push(key)
-                    //             }
-                    //         }
-                    //     });
-                    // })
 
                     let columns = []
                     for (let i = 0; i < 7; i++) {
