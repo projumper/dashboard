@@ -70,6 +70,7 @@
         }
 
         let authorsData = {}
+        let cellsBackgrounds = {}
 
         let SUMCOL = function (instance, columnId) {
             let total = 0;
@@ -91,7 +92,7 @@
         }
 
 
-        let COLORIZE = function (value, status, link) {
+        let COLORIZE = function (instance, value, status, link, cell) {
             let color = ''
             // TODO: re-check statuses
             switch (status) {
@@ -104,17 +105,21 @@
                 case 'In Progress':
                     color = 'blue'
                     break
-                case 'Done':
+                case 'Fertig':
                     color = 'green'
                     break
                 case 'QA':
                     color = 'orange'
                     break
                 default:
-                    color = 'black'
+                    color = 'white'
 
             }
-            return '<a href="' + link + '"><span style="color:' + color + '">' + value + '</span></a>';
+
+            if (cell) {
+                cellsBackgrounds[cell] = 'background-color:' + color + ';'
+            }
+            return '<a target="_blank" href="' + link + '"><span style="color:black">' + value + '</span></a>';
         }
 
         $(document).ready(function () {
@@ -254,7 +259,7 @@
                                 keysList.forEach((key) => {
                                     if (data[date][key] && data[date][key][line]) {
                                         let nr = data[date][key][line]
-                                        tableData[line].push('=COLORIZE("' + nr + '","' + statuses[nr] + '","' + links[nr] + '")');
+                                        tableData[line].push('=COLORIZE(TABLE(), "' + nr + '","' + statuses[nr] + '","' + links[nr] + '", CELL())');
                                     } else {
                                         tableData[line].push('');
                                     }
@@ -286,13 +291,17 @@
                         })
 
 
-                        jexcel($('#week-div').get(0), {
+                        cellsBackgrounds = {}
+
+                        let table = jexcel($('#week-div').get(0), {
                             data: tableData,
                             nestedHeaders: [
                                 headers
                             ],
                             columns: columns
                         });
+
+                        table.setStyle(cellsBackgrounds)
                     }
                 });
             }
@@ -340,20 +349,13 @@
                             }
                         })
 
-                        // Format
                         let tableData = []
-                        statuses.forEach((status, i) => {
+                        Object.keys(data).forEach((key, i) => {
                             tableData[i] = []
-                            tableData[i].push(status)
-
-                            Object.keys(data).forEach(key => {
-                                if (data[key][status]) {
-                                    tableData[i].push(data[key][status])
-                                } else {
-                                    tableData[i].push(0)
-                                }
+                            tableData[i].push(employees[key] ?? 'Unknown')
+                            statuses.forEach((status) => {
+                                tableData[i].push(data[key][status] ?? 0)
                             })
-
                             tableData[i].push('=SUMROW(TABLE(), ROW())')
                         })
 
@@ -361,13 +363,13 @@
                         let footers = []
 
                         columns.push(
-                            {type: 'text', title: 'Status', width: 120},
+                            {type: 'text', title: 'User', width: 120},
                         )
                         footers.push('Total')
 
-                        Object.keys(data).forEach(key => {
+                        statuses.forEach(status => {
                             columns.push(
-                                {type: 'text', title: employees[key] ?? 'Unknown', width: 120},
+                                {type: 'text', title: status, width: 120},
                             )
                             footers.push('=SUMCOL(TABLE(), COLUMN())')
                         })
@@ -396,7 +398,7 @@
                     Object.keys(authorsData[$("#usersList").val()]).forEach(key => {
                         let task = authorsData[$("#usersList").val()][key]
                         tableData.push([
-                            '=COLORIZE("' + key + '","' + task.status + '","' + task.task_link + '")',
+                            '=COLORIZE(TABLE(),"' + key + '","' + task.status + '","' + task.task_link + '")',
                             task.short_description,
                             task.status
                         ])
