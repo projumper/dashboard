@@ -89,7 +89,7 @@ class AddTaskTest extends TestCase
     {
         $keyArray = array();
 
-        $projectArray = array('DSET', 'HKDSHOP', 'BS', 'HKD', 'ZW', 'TIM', 'IM20', 'BL', 'ADC', 'SVB', 'EL', 'ET', 'GOT', 'GF', 'HSSEO', 'HCED', 'HS', 'IZ', 'KAIM', 'TAXI');
+        $projectArray = array('ERIC3','DSET', 'HKDSHOP', 'BS', 'HKD', 'ZW', 'TIM', 'IM20', 'BL', 'ADC', 'SVB', 'EL', 'ET', 'GOT', 'GF', 'HSSEO', 'HCED', 'HS', 'IZ', 'KAIM', 'TAXI', 'KDS', 'WAS');
 
         foreach ($projectArray as $project) {
             for ($i = 1; $i <= 350; $i++) {
