@@ -1,7 +1,29 @@
 @extends('layouts.base')
 
 @section('content')
+    <style>
+        .blinking {
+            animation: blinkingText 1.2s infinite;
+        }
 
+        @keyframes blinkingText {
+            0% {
+                color: #000;
+            }
+            49% {
+                color: #000;
+            }
+            60% {
+                color: white;
+            }
+            99% {
+                color: white;
+            }
+            100% {
+                color: #000;
+            }
+        }
+    </style>
     <div class="row">
         <div class="col-sm-12">
             <input type="text" id="datepicker">
@@ -12,6 +34,14 @@
     <br>
 
     <div class="row" id="monthData">
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-12">
+            <div id="taskinprogress"></div>
+        </div>
     </div>
 
     <br>
@@ -40,10 +70,6 @@
         <div class="col-12">
             <div id="openTasks"></div>
         </div>
-        <div class="col-12">
-            <div id="taskinprogress"></div>
-        </div>
-
     </div>
 
 
@@ -60,6 +86,9 @@
 
 
     <script>
+        const SERVER_DATE_FORMAT = 'YYYY-MM-DD'
+        const CLIENT_DATE_FORMAT = 'DD.MM.YYYY'
+        
         let employees = {
             '5b586e3bd2a2f82da138e269': 'OLeg',
             '557058:660975c1-9644-4563-bcce-6b0b638207ef': 'Ivan R',
@@ -71,10 +100,10 @@
             '5b586e3bd2a2f82da138e269': 'OLeg',
             '557058:660975c1-9644-4563-bcce-6b0b638207ef': 'Ivan R',
             '557058:8f62e10d-7a55-449c-befb-378361c25e56': 'Edgar',
-            '557058:7da53abb-60bb-4ac5-8e14-c5d6186d6117':'Igor',
-            '5eb172d3021ae30ba82474a0':'Ludwig',
-            '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915':'Ivan G.',
-            '5c0e4906dc7a08769e2f2edd':'Ete',
+            '557058:7da53abb-60bb-4ac5-8e14-c5d6186d6117': 'Igor',
+            '5eb172d3021ae30ba82474a0': 'Ludwig',
+            '557058:e33f889f-36f5-476b-a1a7-f21bb2c74915': 'Ivan G.',
+            '5c0e4906dc7a08769e2f2edd': 'Ete',
         }
 
         let authorsData = {}
@@ -100,7 +129,7 @@
         }
 
 
-        let COLORIZE = function (instance, value, status, link, cell) {
+        let COLORIZE = function (table, value, status, link, cell) {
             let color = ''
             // TODO: re-check statuses
             switch (status) {
@@ -119,21 +148,24 @@
                 case 'QA':
                     color = 'orange'
                     break
+                case 'danger':
+                    color = 'RED'
+                    break
                 default:
                     color = 'white'
 
             }
 
             if (cell) {
-                cellsBackgrounds[cell] = 'background-color:' + color + ';'
+                cellsBackgrounds[table][cell] = 'background-color:' + color + ';'
             }
-            return '<a target="_blank" href="' + link + '"><span style="color:black">' + value + '</span></a>';
+            return '<a' + (status == 'danger' ? ' class="blinking"' : '') + ' target="_blank" href="' + link + '"><span style="color:black">' + decodeURI(value) + '</span></a>';
         }
 
         $(document).ready(function () {
 
             $("#datepicker").val(moment().format('YYYY-MM'))
-            $("#week").val(moment().startOf('isoweek').format('YYYY-MM-DD'))
+            $("#week").val(moment().startOf('isoweek').format(SERVER_DATE_FORMAT))
 
             Object.keys(allUsers).forEach(key => {
                 $("#usersList").append(new Option(allUsers[key], key));
@@ -159,12 +191,12 @@
             })
 
             $('#prevWeek').on('click', function () {
-                $("#week").val(moment($("#week").val(), 'YYYY-MM-DD').subtract(7, 'd').format('YYYY-MM-DD'))
+                $("#week").val(moment($("#week").val(), SERVER_DATE_FORMAT).subtract(7, 'd').format(SERVER_DATE_FORMAT))
 
                 getWeek()
             })
             $('#nextWeek').on('click', function () {
-                $("#week").val(moment($("#week").val(), 'YYYY-MM-DD').add(7, 'd').format('YYYY-MM-DD'))
+                $("#week").val(moment($("#week").val(), SERVER_DATE_FORMAT).add(7, 'd').format(SERVER_DATE_FORMAT))
                 getWeek()
             })
 
@@ -190,8 +222,6 @@
                 });
             }
 
-
-
             const getTasksInProgress = () => {
                 $('#taskinprogress').html('')
 
@@ -199,23 +229,81 @@
                     url: "{{ config('app.api_url') }}/getOpenTasks",
                     success: function (result) {
 
-                        jexcel($('#employeeTime').get(0), {
-                            data: result,
-                            footers: [['Total', , '', '', '', '', '', '=SUMCOL(TABLE(), COLUMN())']],
-                            columns: [
-                                {type: 'text', title: 'Oleg', width: 120},
-                                {type: 'text', title: 'Ivan R', width: 320},
-                                {type: 'text', title: 'Edgar', width: 120},
-
-                            ]
+                        let data = {}
+                        let maxTasks = 0
+                        result.forEach(task => {
+                            if (typeof data[task.employee_code] == 'undefined') {
+                                data[task.employee_code] = []
+                            }
+                            data[task.employee_code].push(task)
+                            maxTasks = data[task.employee_code].length > maxTasks ? data[task.employee_code].length : maxTasks
                         });
 
+                        let columns = []
+                        let headers = []
+                        Object.keys(data).forEach(key => {
+                            columns.push({
+                                type: 'html',
+                                title: 'Task link',
+                                width: 80,
+                            });
+                            columns.push({
+                                type: 'html',
+                                title: 'Description',
+                                width: 120,
+                            });
+                            columns.push({
+                                type: 'html',
+                                title: 'Deadline',
+                                width: 90,
+                            });
+
+                            headers.push({
+                                type: 'html',
+                                title: employees[key] ?? key,
+                                colspan: 3
+                            })
+                        })
+
+                        let tableData = []
+                        for (let i = 0; i < maxTasks; i++) {
+                            tableData[i] = [];
+                            Object.keys(data).forEach(key => {
+                                if (data[key][i]) {
+                                    let task = data[key][i];
+
+                                    let status = task['status']
+
+                                    if (task['dealine'] < moment().format(SERVER_DATE_FORMAT)) {
+                                        status = 'danger'
+                                    }
+
+                                    tableData[i].push('=COLORIZE("progress", "' + task['task_p_id_nr'] + '","' + status + '","' + task['task_link'] + '", CELL())')
+                                    // tableData[i].push(task['short_description'])
+                                    tableData[i].push('=COLORIZE("progress", "' + encodeURI(task['short_description']) + '","' + status + '","' + task['task_link'] + '", CELL())')
+                                    tableData[i].push('=COLORIZE("progress", "' + (task['dealine'] ?? '') + '","' + status + '","' + task['task_link'] + '", CELL())')
+                                } else {
+                                    tableData[i].push('')
+                                    tableData[i].push('')
+                                    tableData[i].push('')
+                                }
+                            })
+                        }
+
+                        cellsBackgrounds["progress"] = {}
+
+                        let table = jexcel($('#taskinprogress').get(0), {
+                            data: tableData,
+                            columns: columns,
+                            nestedHeaders: [
+                                headers
+                            ],
+                        });
+
+                        table.setStyle(cellsBackgrounds["progress"])
                     }
                 });
             }
-
-
-
 
             const getMonthData = () => {
                 $('#monthData').html('')
@@ -240,7 +328,7 @@
 
             const getWeek = () => {
                 $('#week-div').html('')
-                $('#weeks-period').html(moment($("#week").val(), 'YYYY-MM-DD').format('DD.MM.YYYY') + '-' + moment($("#week").val(), 'YYYY-MM-DD').add(6, 'd').format('DD.MM.YYYY'))
+                $('#weeks-period').html(moment($("#week").val(), SERVER_DATE_FORMAT).format(CLIENT_DATE_FORMAT) + '-' + moment($("#week").val(), SERVER_DATE_FORMAT).add(6, 'd').format(CLIENT_DATE_FORMAT))
                 $.ajax({
                     url: "{{ config('app.api_url') }}/getEmployeeWeekPlan/week/" + $("#week").val(),
                     success: function (result) {
@@ -250,7 +338,7 @@
 
                         for (let i = 0; i < 7; i++) {
                             // Create array where this week dates is keys
-                            data[moment($("#week").val(), "YYYY-MM-DD").startOf('isoweek').add(i, 'days').format('YYYY-MM-DD')] = {}
+                            data[moment($("#week").val(), SERVER_DATE_FORMAT).startOf('isoweek').add(i, 'days').format(SERVER_DATE_FORMAT)] = {}
                         }
 
                         result.forEach((task => {
@@ -290,11 +378,11 @@
                         for (let line = 0; line < maxEstimate; line++) {
                             tableData[line] = []
                             for (let i = 0; i < 7; i++) {
-                                let date = moment($("#week").val(), "YYYY-MM-DD").startOf('isoweek').add(i, 'days').format('YYYY-MM-DD');
+                                let date = moment($("#week").val(), SERVER_DATE_FORMAT).startOf('isoweek').add(i, 'days').format(SERVER_DATE_FORMAT);
                                 keysList.forEach((key) => {
                                     if (data[date][key] && data[date][key][line]) {
                                         let nr = data[date][key][line]
-                                        tableData[line].push('=COLORIZE(TABLE(), "' + nr + '","' + statuses[nr] + '","' + links[nr] + '", CELL())');
+                                        tableData[line].push('=COLORIZE("week", "' + nr + '","' + statuses[nr] + '","' + links[nr] + '", CELL())');
                                     } else {
                                         tableData[line].push('');
                                     }
@@ -319,13 +407,13 @@
                             if (columnCount) {
                                 headers.push({
                                     type: 'html',
-                                    title: day + ' ' + moment().startOf('isoweek').add(i, 'days').format('DD.MM.YYYY'),
+                                    title: day + ' ' + moment($("#week").val(), SERVER_DATE_FORMAT).startOf('isoweek').add(i, 'days').format(CLIENT_DATE_FORMAT),
                                     colspan: columnCount
                                 })
                             }
                         })
 
-                        cellsBackgrounds = {}
+                        cellsBackgrounds["week"] = {}
 
                         let table = jexcel($('#week-div').get(0), {
                             data: tableData,
@@ -335,7 +423,7 @@
                             columns: columns
                         });
 
-                        table.setStyle(cellsBackgrounds)
+                        table.setStyle(cellsBackgrounds["week"])
                     }
                 });
             }
@@ -431,7 +519,7 @@
                     Object.keys(authorsData[$("#usersList").val()]).forEach(key => {
                         let task = authorsData[$("#usersList").val()][key]
                         tableData.push([
-                            '=COLORIZE(TABLE(),"' + key + '","' + task.status + '","' + task.task_link + '")',
+                            '=COLORIZE("openTasks","' + key + '","' + task.status + '","' + task.task_link + '")',
                             task.short_description,
                             task.status
                         ])
