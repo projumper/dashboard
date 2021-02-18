@@ -46,3 +46,4 @@ Route::get('/getopentask', function () {
 Route::get('/getmonthdata', function () {
     return view('getmonthdata');
 });
+

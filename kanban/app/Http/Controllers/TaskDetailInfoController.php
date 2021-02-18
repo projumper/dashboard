@@ -69,11 +69,11 @@ class TaskDetailInfoController extends Controller
         //return '{tasks:' . $tasks . ', sumtime:' . $sumtime . '}';
         return new JsonResponse([
             'taskall'        => rand(0, 100),
-            'tasksdone'      => rand(0, 100),
-            'tasksqa'        => rand(0, 100),
             'backlog'        => rand(0, 100),
+            'tasksqa'        => rand(0, 100),
             'taskscangolive' => rand(0, 100),
-            'sumtime'        => rand(0, 100),
+            'tasksdone'      => rand(0, 100),
+            'sumtime'        => rand(0, 100)
         ]);
     }
 
