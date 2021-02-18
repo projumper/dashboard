@@ -40,6 +40,10 @@
         <div class="col-12">
             <div id="openTasks"></div>
         </div>
+        <div class="col-12">
+            <div id="taskinprogress"></div>
+        </div>
+
     </div>
 
 
@@ -186,6 +190,33 @@
                 });
             }
 
+
+
+            const getTasksInProgress = () => {
+                $('#taskinprogress').html('')
+
+                $.ajax({
+                    url: "{{ config('app.api_url') }}/getOpenTasks",
+                    success: function (result) {
+
+                        jexcel($('#employeeTime').get(0), {
+                            data: result,
+                            footers: [['Total', , '', '', '', '', '', '=SUMCOL(TABLE(), COLUMN())']],
+                            columns: [
+                                {type: 'text', title: 'Oleg', width: 120},
+                                {type: 'text', title: 'Ivan R', width: 320},
+                                {type: 'text', title: 'Edgar', width: 120},
+
+                            ]
+                        });
+
+                    }
+                });
+            }
+
+
+
+
             const getMonthData = () => {
                 $('#monthData').html('')
                 $.ajax({
@@ -294,7 +325,6 @@
                             }
                         })
 
-
                         cellsBackgrounds = {}
 
                         let table = jexcel($('#week-div').get(0), {
@@ -309,7 +339,6 @@
                     }
                 });
             }
-
 
             const getOpenTasks = () => {
                 $('#openTasks').html('')
@@ -424,6 +453,7 @@
             getEmployeeTime()
             getWeek()
             getOpenTasks()
+            getTasksInProgress()
         });
 
     </script>
