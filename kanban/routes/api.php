@@ -31,6 +31,8 @@ use App\Http\Controllers\TaskDetailInfoController;
     Route::get('v1/getAll', [TaskController::class, 'getAll']);
     Route::get('v1/getTask', 'Task@getTask');
 
+    Route::put('v1/deleteTaskData', [TaskController::class, 'deleteTaskData'])->name('deletetaskdata');
+
 
     Route::get('v1/getworklog/key/{key}', [TaskController::class, 'getWorklog'])->name('getworklog');
 

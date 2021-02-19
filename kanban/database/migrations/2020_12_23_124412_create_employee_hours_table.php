@@ -38,7 +38,7 @@ class CreateEmployeeHoursTable extends Migration
 
             $table->timestamps();
 
-            //$table->foreign('task_p_id_nr')->references('p_id_nr')->on('tasks')->onDelete('cascade');
+            $table->foreign('task_p_id_nr')->references('p_id_nr')->on('tasks')->onDelete('cascade');
         });
     }
 

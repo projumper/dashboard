@@ -319,4 +319,21 @@ class TaskController extends Controller
         }
 
     }
+
+    public function deleteTaskData(Request $request){
+        $p_id_nr = $request->key;
+
+        if ($p_id_nr) {
+
+            try {
+                $task = Task::where('p_id_nr', $p_id_nr)->delete();
+            }catch (\Exception $exception)
+            {
+                $exception->getMessage();
+            }
+
+            return response()->json(['status' => 'Ok']);
+
+        }
+    }
 }
