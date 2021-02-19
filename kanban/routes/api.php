@@ -44,14 +44,14 @@ use App\Http\Controllers\TaskDetailInfoController;
 
     Route::post('v1/addTime', [EmployeeHourController::class, 'addTime'])->name('addtime');
 
-    Route::get('v1/getEmployeeTime/date/{date}', [EmployeeHourController::class, 'getEmployeeTime'])->name('getemployeetime');
+    Route::get('v1/getEmployeeTime/date/{date}/{project?}', [EmployeeHourController::class, 'getEmployeeTime'])->name('getemployeetime');
 
     Route::get('v1/getTasks/date/{date}', [TaskController::class, 'getTasksDate'])->name('gettasks');
 
-    Route::get('v1/getEmployeeWeekPlan/week/{date}', [TaskDetailInfoController::class, 'getEmployeeWeekPlan'])->name('getthisweek');
+    Route::get('v1/getEmployeeWeekPlan/week/{date}/{project?}', [TaskDetailInfoController::class, 'getEmployeeWeekPlan'])->name('getthisweek');
 
-    Route::get('v1/getOpenTasks',[TaskDetailInfoController::class, 'getOpenTasks'])->name('getopentasks');
+    Route::get('v1/getOpenTasks/{project?}',[TaskDetailInfoController::class, 'getOpenTasks'])->name('getopentasks');
 
-    Route::get('v1/getMonthData/date/{date}',[TaskDetailInfoController::class, 'getMonthData'])->name('getmonthdata');
+    Route::get('v1/getMonthData/date/{date}/{project?}',[TaskDetailInfoController::class, 'getMonthData'])->name('getmonthdata');
 
     //Route::get('v1/get/user/{user}/date/{date}/status/{status}', [EmployeeHourController::class, 'getTime'])->name('gettime');

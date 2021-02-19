@@ -84,10 +84,19 @@
         </div>
     </div>
 
+    <div id="no-data-html" style="display: none">
+        <div class="card  border-left-secondary">
+            <div class="card-body"><h2>No data for this period!</h2></div>
+        </div>
+    </div>
+
+
 
     <script>
         const SERVER_DATE_FORMAT = 'YYYY-MM-DD'
         const CLIENT_DATE_FORMAT = 'DD.MM.YYYY'
+        const API_URL = "{{config('app.api_url')}}"
+        const PROJECT = "{{ $project ?? '' }}"
 
         let employees = {
             '5b586e3bd2a2f82da138e269': 'OLeg',
@@ -211,7 +220,7 @@
                 $('#employeeTime').html('')
 
                 $.ajax({
-                    url: "{{ config('app.api_url') }}/getEmployeeTime/date/" + $('#datepicker').val() + '-01',
+                    url: API_URL + "/getEmployeeTime/date/" + $('#datepicker').val() + '-01' + (PROJECT ? ('/' + PROJECT) : ''),
                     success: function (result) {
 
                         jexcel($('#employeeTime').get(0), {
@@ -233,7 +242,7 @@
                 $('#taskinprogress').html('')
 
                 $.ajax({
-                    url: "{{ config('app.api_url') }}/getOpenTasks",
+                    url: API_URL + "/getOpenTasks" + (PROJECT ? ('/' + PROJECT) : ''),
                     success: function (result) {
 
                         let data = {}
@@ -299,15 +308,20 @@
 
                         cellsBackgrounds["progress"] = {}
 
-                        let table = jexcel($('#taskinprogress').get(0), {
-                            data: tableData,
-                            columns: columns,
-                            nestedHeaders: [
-                                headers
-                            ],
-                        });
+                        if (!tableData.length) {
+                            $('#taskinprogress').html($('#no-data-html').html());
+                        } else {
+                            let table = jexcel($('#taskinprogress').get(0), {
+                                data: tableData,
+                                columns: columns,
+                                nestedHeaders: [
+                                    headers
+                                ],
+                            });
 
-                        table.setStyle(cellsBackgrounds["progress"])
+                            table.setStyle(cellsBackgrounds["progress"])
+                        }
+
                     }
                 });
             }
@@ -315,7 +329,7 @@
             const getMonthData = () => {
                 $('#monthData').html('')
                 $.ajax({
-                    url: "{{ config('app.api_url') }}/getMonthData/date/" + $('#datepicker').val() + '-01',
+                    url: API_URL + "/getMonthData/date/" + $('#datepicker').val() + '-01' + (PROJECT ? ('/' + PROJECT) : ''),
                     success: function (result) {
 
                         Object.keys(result).forEach(key => {
@@ -337,7 +351,7 @@
                 $('#week-div').html('')
                 $('#weeks-period').html(moment($("#week").val(), SERVER_DATE_FORMAT).format(CLIENT_DATE_FORMAT) + '-' + moment($("#week").val(), SERVER_DATE_FORMAT).add(6, 'd').format(CLIENT_DATE_FORMAT))
                 $.ajax({
-                    url: "{{ config('app.api_url') }}/getEmployeeWeekPlan/week/" + $("#week").val(),
+                    url: API_URL + "/getEmployeeWeekPlan/week/" + $("#week").val() + (PROJECT ? ('/' + PROJECT) : ''),
                     success: function (result) {
                         let data = {}
                         let statuses = {}
@@ -420,17 +434,21 @@
                             }
                         })
 
-                        cellsBackgrounds["week"] = {}
+                        if (!tableData.length) {
+                            $('#week-div').html($('#no-data-html').html());
+                        } else {
+                            cellsBackgrounds["week"] = {}
 
-                        let table = jexcel($('#week-div').get(0), {
-                            data: tableData,
-                            nestedHeaders: [
-                                headers
-                            ],
-                            columns: columns
-                        });
+                            let table = jexcel($('#week-div').get(0), {
+                                data: tableData,
+                                nestedHeaders: [
+                                    headers
+                                ],
+                                columns: columns
+                            });
 
-                        table.setStyle(cellsBackgrounds["week"])
+                            table.setStyle(cellsBackgrounds["week"])
+                        }
                     }
                 });
             }
@@ -438,7 +456,7 @@
             const getOpenTasks = () => {
                 $('#openTasks').html('')
                 $.ajax({
-                    url: "{{ config('app.api_url') }}/getOpenTasks", success: function (result) {
+                    url: API_URL + "/getOpenTasks" + (PROJECT ? ('/' + PROJECT) : ''), success: function (result) {
                         authorsData = {}
                         result.forEach(task => {
                             if (typeof authorsData[task.author_code] == 'undefined') {
@@ -506,11 +524,15 @@
                         )
                         footers.push('=SUMCOL(TABLE(), COLUMN())')
 
-                        jexcel(document.getElementById('openTasks'), {
-                            data: tableData,
-                            footers: [footers],
-                            columns: columns
-                        });
+                        if (!tableData.length) {
+                            $('#openTasks').html($('#no-data-html').html());
+                        } else {
+                            jexcel(document.getElementById('openTasks'), {
+                                data: tableData,
+                                footers: [footers],
+                                columns: columns
+                            });
+                        }
 
 
                     }
@@ -534,14 +556,18 @@
 
                 }
 
-                jexcel(document.getElementById('openTasksByAuthor'), {
-                    data: tableData,
-                    columns: [
-                        {type: 'html', title: 'Link', width: 120},
-                        {type: 'text', title: 'Description', width: 320},
-                        {type: 'text', title: 'Status', width: 200},
-                    ]
-                });
+                if (!tableData.length) {
+                    $('#openTasksByAuthor').html($('#no-data-html').html());
+                } else {
+                    jexcel(document.getElementById('openTasksByAuthor'), {
+                        data: tableData,
+                        columns: [
+                            {type: 'html', title: 'Link', width: 120},
+                            {type: 'text', title: 'Description', width: 320},
+                            {type: 'text', title: 'Status', width: 200},
+                        ]
+                    });
+                }
             }
 
             getMonthData()
