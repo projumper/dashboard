@@ -16,10 +16,13 @@ class TaskDetailInfoController extends Controller
 
         $times = DB::table('task_detail_infos')
             ->select('*')
-            ->whereBetween('start_date', [$from, $to])
-            ->get();
+            ->whereBetween('start_date', [$from, $to]);
 
-        return json_decode($times);
+        if ($request->project) {
+            $times->where('p_id', '=', $request->project);
+        }
+
+        return json_decode($times->get());
     }
 
     public function getOpenTasks(Request $request)
@@ -34,10 +37,13 @@ class TaskDetailInfoController extends Controller
             ->where('status', '<>', 'Done')
             ->where('status', '<>', 'Backlog')
             ->where('issue_type', '<>', 'Story')
-            ->where('issue_type', '<>', 'Epic')
-            ->get();
+            ->where('issue_type', '<>', 'Epic');
 
-        return json_decode($times);
+        if ($request->project) {
+            $times->where('p_id', '=', $request->project);
+        }
+
+        return json_decode($times->get());
     }
 
     public function getMonthData(Request $request)

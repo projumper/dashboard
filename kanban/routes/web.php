@@ -18,17 +18,17 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
+Route::get('/project/{id}', function ($id) {
+    return view('dashboard', ['project' => $id]);
+});
 
 Route::get('/matime', function () {
     return view('matime');
 });
 
-
-
 Route::get('/getthisweek', function () {
     return view('getthisweek');
 });
-
 
 Route::get('/alltasks', function () {
     return view('alltasks');
@@ -41,7 +41,6 @@ Route::get('/getemployeetime', function () {
 Route::get('/getopentask', function () {
     return view('getopentask');
 });
-
 
 Route::get('/getmonthdata', function () {
     return view('getmonthdata');
