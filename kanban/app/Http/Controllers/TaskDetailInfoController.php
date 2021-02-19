@@ -31,6 +31,7 @@ class TaskDetailInfoController extends Controller
 //            ->select('status', 'task_p_id_nr', 'issue_type')
             ->where('start_date', '<', $today)
             ->where('status', '<>', 'Fertig')
+            ->where('status', '<>', 'Done')
             ->where('status', '<>', 'Backlog')
             ->where('issue_type', '<>', 'Story')
             ->where('issue_type', '<>', 'Epic')

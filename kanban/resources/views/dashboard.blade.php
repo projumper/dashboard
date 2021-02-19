@@ -149,6 +149,9 @@
                 case 'Fertig':
                     color = 'green'
                     break
+                case 'Done':
+                    color = 'green'
+                    break
                 case 'QA':
                     color = 'orange'
                     break
