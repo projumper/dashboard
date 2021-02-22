@@ -280,7 +280,7 @@ class TaskController extends Controller
         $time = DB::table('task_detail_infos')
             ->select('task_p_id_nr','task_link','dealine', 'short_description', 'estimated_time','total_time', 'pm_employee_code', 'pm_employee_time_total', 'employee_time_total', 'tester_code', 'author_code', 'status','indeed_deadline', 'p_id', 'kva_id_paid', 'customer_task_raiting')
             ->whereBetween('dealine', [$from, $to])
-            ->orWhere('status', 'Backlog')
+            //->orWhere('status', 'Backlog')
             ->get();
 
         return json_decode($time);
