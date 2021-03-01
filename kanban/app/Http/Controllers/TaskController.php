@@ -160,6 +160,13 @@ class TaskController extends Controller
                     $start_date = '1981-12-12';
                 }
 
+                if($payload->fields->customfield_10206 == ''){
+                    $indeed_deadline = $payload->fields->duedate;
+                }else{
+                    $start_date = '1981-12-12';
+                }
+
+
                 \Log::info('createdate_jira '. date('Y-m-d', strtotime($payload->fields->created)));
                 \Log::info('task_link ' . 'https://zentralweb.atlassian.net/browse/'.$p_id_nr);
                 \Log::info('dealine '. $payload->fields->duedate);
@@ -173,7 +180,7 @@ class TaskController extends Controller
                 \Log::info('tester_code '. $tester_code);
                 \Log::info('author_code '.$creator_id);
                 \Log::info('status ' .$payload->fields->status->name);
-                \Log::info('indeed_deadline '. date('Y-m-d', strtotime($payload->fields->customfield_10206)));
+                \Log::info('indeed_deadline '. $indeed_deadline);  //date('Y-m-d', strtotime($payload->fields->customfield_10206)));
                 \Log::info('p_id '. $payload->fields->project->key);
                 //fields►issuetype►name
                 \Log::info('kva_id_paid '. '');
@@ -195,7 +202,7 @@ class TaskController extends Controller
                     'tester_code' => $tester_code,
                     'author_code' =>$creator_id,
                     'status' => $payload->fields->status->name,
-                    'indeed_deadline' => date('Y-m-d', strtotime($payload->fields->customfield_10206)),
+                    'indeed_deadline' => $indeed_deadline, //date('Y-m-d', strtotime($payload->fields->customfield_10206)),
                     'p_id' => $payload->fields->project->key,
                     'issue_type' => $payload->fields->issuetype->name,
                     'kva_id_paid' => '',
