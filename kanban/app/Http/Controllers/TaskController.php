@@ -160,7 +160,8 @@ class TaskController extends Controller
                     $start_date = '1981-12-12';
                 }
 
-                if($payload->fields->customfield_10206 == ''){
+                $indeed_deadline = '';
+                if(!isset($payload->fields->customfield_10206)){
                     $indeed_deadline = $payload->fields->duedate;
                 }else{
                     $indeed_deadline = $payload->fields->customfield_10206;
