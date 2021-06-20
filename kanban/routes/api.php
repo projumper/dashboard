@@ -28,6 +28,7 @@ use App\Http\Controllers\TaskDetailInfoController;
 
     Route::post('v1/addTask', [TaskController::class, 'addTask'])->name('add');
     Route::put('v1/editTask', [TaskController::class, 'editTask'])->name('edit');
+    Route::put('v1/deletetask/key/{key}', [TaskController::class, 'deleteTask']);
     Route::get('v1/getAll', [TaskController::class, 'getAll']);
     Route::get('v1/getTask', 'Task@getTask');
 

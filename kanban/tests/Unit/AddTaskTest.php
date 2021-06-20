@@ -82,25 +82,47 @@ class AddTaskTest extends TestCase
             $this->putJson(route('edit'), $data)
                 ->assertStatus(200)
                 ->assertJson(['status' => 'OK']);
+        }else{
+            $this->putJson('api/v1/deletetask/key/' . $p_id_nr)
+                ->assertStatus(200)
+                ->assertJson(['status' => 'Ok']);
         }
+    }
+
+    /**
+     * @dataProvider keyProvider
+     */
+    public function test_delete_task($p_id_nr){
+
+        $taskData = $this->getJson('api/v1/gettaskdata/key/' . $p_id_nr);
+        $taskData1 = $taskData->getContent();
+        $jsonstring = json_decode($taskData1);
+        $data = get_object_vars($jsonstring);
+
+        /*
+        if (isset($jsonstring->key) && $jsonstring->key == $p_id_nr) {
+            $this->putJson(route('deletetaskdata'), $data)
+                ->assertStatus(200)
+                ->assertJson(['status' => 'Ok']);
+        }
+        */
     }
 
     public function keyProvider()
     {
         $keyArray = array();
 
-        $projectArray = array('ERICA30','DSET', 'HKDSHOP', 'BS', 'HKD', 'ZW', 'TIM', 'IM20', 'BL', 'ADC', 'SVB', 'EL', 'ET', 'GOT', 'GF', 'HSSEO', 'HCED', 'HS', 'IZ', 'KAIM', 'TAXI', 'KDS', 'WAS');
+       // $projectArray = array('ERICA30','DSET', 'HKDSHOP', 'BS', 'HKD', 'ZW', 'TIM', 'IM20', 'BL', 'ADC', 'SVB', 'EL', 'ET', 'GOT', 'GF', 'HSSEO', 'HCED', 'HS', 'IZ', 'KAIM', 'TAXI', 'KDS', 'WAS');
+        $projectArray = array('TEST', 'ZW');
 
         foreach ($projectArray as $project) {
-            for ($i = 1; $i <= 350; $i++) {
+            for ($i = 280; $i <= 285; $i++) {
 
                 $p_id_nr = $project . '-' . $i;
 
                 $keyArray[] = ['key' => $p_id_nr];
             }
         }
-
         return $keyArray;
-
     }
 }
